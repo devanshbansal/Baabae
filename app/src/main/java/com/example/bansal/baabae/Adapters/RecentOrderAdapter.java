@@ -49,10 +49,10 @@ public class RecentOrderAdapter extends ArrayAdapter<OrderSummary> {
         String summary="";
         for(int i=0;i<items.size();i++)
         {
-            summary=summary+items.get(i).getName()+": "+items.get(i).getQuantity()+"\n";
+            summary=summary+items.get(i).getName()+"\n";
         }
         recent=convertView.findViewById(R.id.recent);
-        recent_button=convertView.findViewById(R.id.recent_button);
+       // recent_button=convertView.findViewById(R.id.recent_button);
         recent.setText(summary); }
         return convertView;
     }

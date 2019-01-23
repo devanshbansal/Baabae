@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class LoginActivity extends AppCompatActivity {
+    public static  String Name;
     EditText number;
     EditText password;
    public static ArrayList<OrderSummary> recentOrders;
@@ -51,6 +52,7 @@ public class LoginActivity extends AppCompatActivity {
                                 try {
                                     if(snapshot.child("password").getValue().equals( password.getText().toString()))
                                     {
+                                       String name = snapshot.child("name").getValue().toString();
                                         Object value = (HashMap) snapshot.getValue();
                                       //  final Object value = ((HashMap) val).get(number.getText().toString());
                                         Object number = ((HashMap) value).get("number");
@@ -65,6 +67,7 @@ public class LoginActivity extends AppCompatActivity {
                                         recentOrders=new ArrayList<OrderSummary>();
                                         Intent i = new Intent(getApplicationContext(),HomeActivity.class);
                                         i.putExtra("user",userForm);
+                                        i.putExtra("name",name);
                                         i.putExtra("recent",recentOrders);
                                         startActivity(i);
                                         finish();

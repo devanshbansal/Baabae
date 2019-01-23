@@ -18,24 +18,24 @@ import com.example.bansal.baabae.R;
 import java.util.ArrayList;
 import java.util.Stack;
 
-public class ProductListAdapter extends ArrayAdapter<String> {
-   // Integer count;
+public class HomeListAdapter extends ArrayAdapter<String> {
+    // Integer count;
     TextView brand,price;
     public OrderSummary summary;
     String[] obj;
     private final Context context;
-   public static Stack<View> buttons;
+    public static Stack<View> buttons;
     // Spinner spinner;
-   // ArrayList<Spinner> spinnerArray;
+    // ArrayList<Spinner> spinnerArray;
     Button add;
 
-    public ProductListAdapter(Context context, String[] objects) {
+    public HomeListAdapter(Context context, String[] objects) {
         super(context, 0, objects);
         this.context = context;
         this.obj=objects;
         this.summary=new OrderSummary();
         buttons = new Stack<>();
-       // this.spinnerArray= new ArrayList<Spinner>(obj.length);
+        // this.spinnerArray= new ArrayList<Spinner>(obj.length);
     }
 
     @Override
@@ -57,10 +57,10 @@ public class ProductListAdapter extends ArrayAdapter<String> {
         });
         brand.setText(obj[position]);
 
-   //     price=convertView.findViewById(R.id.price);
-    //    price.setText(obj[position].getPrice().toString());
-     //   spinner=convertView.findViewById(R.id.planets_spinner);
-      //  spinnerArray.add(spinner);
+        //     price=convertView.findViewById(R.id.price);
+        //    price.setText(obj[position].getPrice().toString());
+        //   spinner=convertView.findViewById(R.id.planets_spinner);
+        //  spinnerArray.add(spinner);
 //        ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(context,
 //                R.array.planets_array, android.R.layout.simple_spinner_item);
 //        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -71,13 +71,13 @@ public class ProductListAdapter extends ArrayAdapter<String> {
         buttons.add(v);
         v.setVisibility(View.INVISIBLE);
         int t= (int) v.getTag();
-      //  Spinner temp=spinnerArray.get((Integer)v.getTag());
+        //  Spinner temp=spinnerArray.get((Integer)v.getTag());
 //        int count=  Integer.parseInt(temp.getSelectedItem().toString());
 //        if(count!=0)
 //        {
-         //   summary.getItems().add(new OrderItem(obj[t].getName(),"NA",String.valueOf("NA")));
-            Toast.makeText(getContext(),"Item Added",Toast.LENGTH_SHORT).show();
-    //}
+        //summary.getItems().add(new OrderItem(obj[t].getName(),"NA",String.valueOf("NA")));
+        Toast.makeText(getContext(),"Item Added",Toast.LENGTH_SHORT).show();
+        //}
     }
 
     public static void setButtonsVisible(){

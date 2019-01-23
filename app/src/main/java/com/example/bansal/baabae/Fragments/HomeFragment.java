@@ -1,8 +1,10 @@
 package com.example.bansal.baabae.Fragments;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -12,8 +14,12 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.bansal.baabae.Adapters.HomeListAdapter;
 import com.example.bansal.baabae.Adapters.ProductListAdapter;
 import com.example.bansal.baabae.Checkout;
 import com.example.bansal.baabae.HomeActivity;
@@ -21,7 +27,13 @@ import com.example.bansal.baabae.Models.OrderItem;
 import com.example.bansal.baabae.Models.OrderSummary;
 import com.example.bansal.baabae.Models.SignUpForm;
 import com.example.bansal.baabae.Models.Transaction;
+import com.example.bansal.baabae.Products.Benson;
 import com.example.bansal.baabae.Products.Cigarette;
+import com.example.bansal.baabae.Products.Classic;
+import com.example.bansal.baabae.Products.Davidoff;
+import com.example.bansal.baabae.Products.Dunhill;
+import com.example.bansal.baabae.Products.Goldflake;
+import com.example.bansal.baabae.Products.Marlboro;
 import com.example.bansal.baabae.R;
 import com.example.bansal.baabae.Utility.UtilityFunctions;
 import com.google.firebase.database.DatabaseReference;
@@ -32,8 +44,12 @@ import java.util.ArrayList;
 public class HomeFragment extends BaseFragment implements AdapterView.OnItemSelectedListener {
     TextView text;
     OrderSummary summary;
+    EditText address;
     SignUpForm userForm;
-    ProductListAdapter adapter;
+    Button cart;
+    public ArrayList<String> selectedBrands = new ArrayList<>();
+    HomeListAdapter adapter;
+    ArrayList<String[]> branditems = new ArrayList<>();
     Button confirm;
     String orderDetails;
     Button add;
@@ -51,6 +67,23 @@ public class HomeFragment extends BaseFragment implements AdapterView.OnItemSele
         FirebaseDatabase database = FirebaseDatabase.getInstance();     // Getting database reference
         final DatabaseReference myRef = database.getReference( );
         userForm=HomeActivity.userForm;
+        cart=view.findViewById(R.id.cart);
+        cart.setEnabled(false);
+        cart.setVisibility(View.INVISIBLE);
+        cart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                OpenConfirmDialog();
+            }
+        });
+
+
+        branditems.add(Marlboro.items);
+        branditems.add(Benson.items);
+        branditems.add(Classic.items);
+        branditems.add(Davidoff.items);
+        branditems.add(Dunhill.items);
+        branditems.add(Goldflake.items);
 
         obj=new Cigarette[5];
         obj[0] = new Cigarette("Marlboro Advance",15);
@@ -60,55 +93,122 @@ public class HomeFragment extends BaseFragment implements AdapterView.OnItemSele
         obj[4]=new Cigarette("Kings Light",15);
 
         ListView listView = (ListView) view.findViewById(R.id.lv);
-        adapter = new ProductListAdapter(getContext(),obj);               // Finding views
+        //   address = view.findViewById(R.id.address);
+        final String[] brandlist = new String[6];
+        brandlist[0]="Marlboro";
+        brandlist[1]="Benson";
+        brandlist[2]="Classic";
+        brandlist[3]="Davidoff";
+        brandlist[4]="Dunhill";
+        brandlist[5]="Goldflake";
+
+
+        adapter = new HomeListAdapter(getContext(),brandlist);               // Finding views
         listView.setAdapter(adapter);
-        confirm=view.findViewById(R.id.place);
+        // confirm=view.findViewById(R.id.place);
 
-        confirm.setOnClickListener(new View.OnClickListener() {
+//        confirm.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        switch (which){
+//                            case DialogInterface.BUTTON_POSITIVE:    //Action on the order confirmation
+//                                String id = UtilityFunctions.generateUniqueID();
+//                                Transaction trans = new Transaction(id,UtilityFunctions.generateTimeStamp(),address.getText().toString(),summary);
+//                                myRef.child("transactions").child("pending").child(id).setValue(trans);
+//                                myRef.child("orders").child("users").child(userForm.getNumber()).child(id).setValue(trans);
+//                                adapter.summary = new OrderSummary();
+//                                adapter.setButtonsVisible();
+//                                Intent i = new Intent(getActivity(),Checkout.class);
+//                                startActivity(i);
+//                                break;
+//
+//                            case DialogInterface.BUTTON_NEGATIVE:
+//                                break;
+//                        }
+//                    }
+//                };
+//                summary = adapter.summary;
+//                orderDetails="";
+//                ArrayList<OrderItem> items = summary.getItems();
+//                for(int i=0;i<summary.getItems().size();i++){
+//                    orderDetails=orderDetails+items.get(i).getName()+"\n";
+//                }
+//
+//                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+//                builder.setMessage("Your order details are:\n"+orderDetails+"\n").setPositiveButton("Yes", dialogClickListener)
+//                        .setNegativeButton("No", dialogClickListener).show();
+//            }
+//        });
+
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //   Toast.makeText(getContext(),"Hello",Toast.LENGTH_SHORT).show();
+
+                final Dialog dialog = new Dialog(getContext());
+                dialog.setContentView(R.layout.product_list_dialog_adapter);
+                final String brandName = brandlist[position];
+                final Integer brandPosition = position;
+
+                dialog.setTitle(brandName);
+                ListView listView = (ListView) dialog.findViewById(R.id.lv_dialog);
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
-                            case DialogInterface.BUTTON_POSITIVE:    //Action on the order confirmation
-                                String id = UtilityFunctions.generateUniqueID();
-                                Transaction trans = new Transaction(id,UtilityFunctions.generateTimeStamp(),summary);
-                                myRef.child("transactions").child("pending").child(id).setValue(trans);
-                                myRef.child("orders").child("users").child(userForm.getNumber()).child(id).setValue(trans);
-                                adapter.summary = new OrderSummary();
-                                Intent i = new Intent(getActivity(),Checkout.class);
-                                startActivity(i);
-                                break;
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        dialog.dismiss();
+                        selectedBrands.add(brandName+" "+branditems.get(brandPosition)[position]);
+                        cart.setVisibility(View.VISIBLE);
+                        cart.setEnabled(true);
+                        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which){
+                                    case DialogInterface.BUTTON_POSITIVE:
+                                        dialog.dismiss();
+                                   OpenConfirmDialog();
+                                        break;
 
-                            case DialogInterface.BUTTON_NEGATIVE:
-                                break;
-                        }
+                                    case DialogInterface.BUTTON_NEGATIVE:
+                                        break;
+                                }
+                            }
+                        };
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                        builder.setMessage("You are just few steps away from getting the cigarettes. Continue?").setPositiveButton("PLACE ORDER", dialogClickListener)
+                                .setNegativeButton("ADD MORE", dialogClickListener).show();
+
+
+
                     }
-                };
-                summary = adapter.summary;
-                Integer total=0;
-                orderDetails="";
-                ArrayList<OrderItem> items = summary.getItems();
-                for(int i=0;i<summary.getItems().size();i++){
-
-                    total=total+Integer.parseInt(items.get(i).getPrice())*Integer.parseInt(items.get(i).getQuantity());
-                    orderDetails=orderDetails+items.get(i).getName()+": "+items.get(i).getQuantity()+"\n";
-                }
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setMessage("Your order details are:\n"+orderDetails+"\n"+"Total price is: "+total.toString()).setPositiveButton("Yes", dialogClickListener)
-                        .setNegativeButton("No", dialogClickListener).show();
+                });
+                ProductListAdapter productListAdapter = new ProductListAdapter(getContext(),branditems.get(position));// Finding views
+                listView.setAdapter(productListAdapter);
+                dialog.show();
             }
         });
-
-        text=view.findViewById(R.id.total);
 
 
     }
 
     public void AddItem(View v){
         ViewParent parent=v.getParent();
+    }
+
+    public void OpenConfirmDialog(){
+        Dialog d = new Dialog(getContext());
+        d.setContentView(R.layout.confirm_order_dialog);
+        TextView detailView = d.findViewById(R.id.textView9);
+        String details="Shopping Cart Details:"+"\n";
+        for(int i=0;i<selectedBrands.size();i++){
+            details=details+""+selectedBrands.get(i)+" ";
+
+        }
+        detailView.setText(details);
+        d.show();
     }
 
     @Override

@@ -38,6 +38,7 @@ public class HomeActivity extends AppCompatActivity {
     public static ArrayList<OrderSummary> recentOrders;
     public static OrderSummary[] recentOrder;
 
+
     private static final String[] TITLES = {"HOME", "RECENT ORDERS", "PROFILE"};
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -59,11 +60,14 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         recentOrders=new ArrayList<OrderSummary>();
+        setTitle("asjdk");
+        setTitle(getIntent().getStringExtra("name"));
+    //    getActionBar().setTitle(getIntent().getStringExtra("name"));
         recentOrder =new OrderSummary[0];
        //recentOrders=(ArrayList<OrderSummary>)getIntent().getSerializableExtra("recent");
        userForm=(SignUpForm)getIntent().getSerializableExtra("user");
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        final DatabaseReference myRef = database.getReference("orders").child(userForm.getNumber());
+        final DatabaseReference myRef = database.getReference("orders").child("users").child(userForm.getNumber());
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -71,7 +75,9 @@ public class HomeActivity extends AppCompatActivity {
                     recentOrders.clear();
                     ArrayList<OrderItem> r;
                     for (DataSnapshot messageSnapshot: dataSnapshot.getChildren()) {
-                        ArrayList<Object> value = (ArrayList<Object> )messageSnapshot.getValue();
+                        HashMap<String,Object> summ = (HashMap<String, Object>) messageSnapshot.getValue();
+                        HashMap<String,Object> s = (HashMap<String, Object>) summ.get("summary");
+                        ArrayList<Object> value = (ArrayList<Object> )s.get("items");
                         r = new ArrayList<OrderItem>();
                         for(int i=0;i<value.size();i++)
                         {
