@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.bansal.baabae.HomeActivity">
+    tools:context="com.company.bansal.baabae.HomeActivity">
     <item
         android:id="@+id/share"
         android:orderInCategory="100"
