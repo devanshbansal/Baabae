@@ -1,13 +1,18 @@
 package com.example.bansal.baabae.Fragments;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +41,7 @@ import com.example.bansal.baabae.Products.Goldflake;
 import com.example.bansal.baabae.Products.Marlboro;
 import com.example.bansal.baabae.R;
 import com.example.bansal.baabae.Utility.UtilityFunctions;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -46,14 +52,16 @@ public class HomeFragment extends BaseFragment implements AdapterView.OnItemSele
     OrderSummary summary;
     EditText address;
     SignUpForm userForm;
-    Button cart;
-    public ArrayList<String> selectedBrands = new ArrayList<>();
+   public static Button cart, emptyCart;
+    FirebaseDatabase database;
+    public static ArrayList<String> selectedBrands = new ArrayList<>();
     HomeListAdapter adapter;
     ArrayList<String[]> branditems = new ArrayList<>();
     Button confirm;
     String orderDetails;
     Button add;
     Cigarette obj[];
+    String userAddress;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -64,7 +72,7 @@ public class HomeFragment extends BaseFragment implements AdapterView.OnItemSele
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();     // Getting database reference
+         database = FirebaseDatabase.getInstance();     // Getting database reference
         final DatabaseReference myRef = database.getReference( );
         userForm=HomeActivity.userForm;
         cart=view.findViewById(R.id.cart);
@@ -76,6 +84,7 @@ public class HomeFragment extends BaseFragment implements AdapterView.OnItemSele
                 OpenConfirmDialog();
             }
         });
+
 
 
         branditems.add(Marlboro.items);
@@ -178,7 +187,7 @@ public class HomeFragment extends BaseFragment implements AdapterView.OnItemSele
                             }
                         };
                         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                        builder.setMessage("You are just few steps away from getting the cigarettes. Continue?").setPositiveButton("PLACE ORDER", dialogClickListener)
+                        builder.setMessage("We've picked the boxes, reaching you ASAP. Continue?").setPositiveButton("PLACE ORDER", dialogClickListener)
                                 .setNegativeButton("ADD MORE", dialogClickListener).show();
 
 
@@ -199,18 +208,147 @@ public class HomeFragment extends BaseFragment implements AdapterView.OnItemSele
     }
 
     public void OpenConfirmDialog(){
-        Dialog d = new Dialog(getContext());
+        final Dialog d = new Dialog(getContext());
         d.setContentView(R.layout.confirm_order_dialog);
         TextView detailView = d.findViewById(R.id.textView9);
-        String details="Shopping Cart Details:"+"\n";
+        Button confirm = d.findViewById(R.id.button10);
+        confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Dialog finalDialog = new Dialog(getContext());
+                finalDialog.setContentView(R.layout.address_dialog);
+                finalDialog.setTitle("Where at?");
+                Button done= finalDialog.findViewById(R.id.done);
+                final EditText a1 = finalDialog.findViewById(R.id.a1);
+                final EditText a2 = finalDialog.findViewById(R.id.a2);
+                final EditText a3 = finalDialog.findViewById(R.id.a3);
+                done.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(!isNetworkAvailable())
+                        {
+                            Toast.makeText(getContext(),"Please check your Internet Connection",Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if(a1.getText().toString().isEmpty()||a2.getText().toString().isEmpty()||a3.getText().toString().isEmpty())
+                        {
+                            Toast.makeText(getContext(),"Please enter the address details correctly",Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+
+                        userAddress = a1.getText().toString()+" "+a2.getText().toString()+" "+a3.getText().toString();
+                        ArrayList<OrderItem> orderItems=new ArrayList<>();
+                        for(int i=0;i<selectedBrands.size();i++)
+                            orderItems.add(new OrderItem(selectedBrands.get(i)));
+                        OrderSummary su = new OrderSummary(orderItems);
+                        String id=UtilityFunctions.generateUniqueID();
+                        Transaction trans = new Transaction(id,UtilityFunctions.generateTimeStamp(),userAddress,HomeActivity.userForm.getNumber(),su);
+                        final DatabaseReference myRef = database.getReference();
+                        myRef.child("transactions").child("pending").child(id).setValue(trans);
+                        myRef.child("upcoming_orders").child(userForm.getNumber()).child(id).setValue(trans);
+                        myRef.child("orders").child("users").child(userForm.getNumber()).child(id).setValue(trans, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                                if (databaseError != null) {
+                                  Toast.makeText(getContext(),"Sorry, your order couldn't be placed. Please check your Internet Connection and try again",Toast.LENGTH_SHORT).show();
+                                } else {
+                                    finalDialog.dismiss();
+                                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            switch (which) {
+                                                case DialogInterface.BUTTON_POSITIVE:
+                                                    selectedBrands.clear();
+                                                    cart.setVisibility(View.INVISIBLE);
+                                                    dialog.dismiss();
+                                                    break;
+
+                                                case DialogInterface.BUTTON_NEGATIVE:
+                                                    selectedBrands.clear();
+                                                    cart.setVisibility(View.INVISIBLE);
+                                                    dialog.dismiss();
+                                                    Intent intent = new Intent(Intent.ACTION_DIAL);
+                                                    intent.setData(Uri.parse("tel:9877952375"));
+                                                    startActivity(intent);
+                                                    break;
+                                            }
+                                        }
+                                    };
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                    builder.setMessage("Boom! Baabae on the way carrying your preferred brand. Pay on the spot with Cash / Paytm / GooglePay").setPositiveButton("NEW ORDER", dialogClickListener)
+                                            .setNegativeButton("HELP", dialogClickListener).show();
+                                }
+                            }
+                        });
+
+
+                        }
+
+
+                    });
+
+                finalDialog.show();
+                d.dismiss();
+
+            }
+        });
+
+        Button addMore= d.findViewById(R.id.button12);
+
+        addMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                d.dismiss();
+            }
+        });
+        Button emptyCart = d.findViewById(R.id.button11);
+        emptyCart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cart.setEnabled(false);
+                cart.setVisibility(View.INVISIBLE);
+                selectedBrands.clear();
+                d.dismiss();
+            }
+        });
+        String details="<b>Shopping Cart Details:</b>"+"\n";
         for(int i=0;i<selectedBrands.size();i++){
             details=details+""+selectedBrands.get(i)+" ";
 
         }
-        detailView.setText(details);
+        detailView.setText(Html.fromHtml(details));
         d.show();
     }
 
+    public int saveOrderTransaction(){
+        final int[] result = {-1};
+        ArrayList<OrderItem> orderItems=new ArrayList<>();
+        for(int i=0;i<selectedBrands.size();i++)
+            orderItems.add(new OrderItem(selectedBrands.get(i)));
+        OrderSummary su = new OrderSummary(orderItems);
+        String id=UtilityFunctions.generateUniqueID();
+        Transaction trans = new Transaction(id,UtilityFunctions.generateTimeStamp(),userAddress,HomeActivity.userForm.getNumber(),su);
+        final DatabaseReference myRef = database.getReference();
+        myRef.child("transactions").child("pending").child(id).setValue(trans);
+        myRef.child("orders").child("users").child(userForm.getNumber()).child(id).setValue(trans, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                if (databaseError != null) {
+                   result[0] =0;
+                } else {
+                 result[0] =1;
+                }
+            }
+        });
+        return result[0];
+    }
+    public boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 

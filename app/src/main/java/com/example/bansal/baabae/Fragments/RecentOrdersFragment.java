@@ -12,13 +12,14 @@ import com.example.bansal.baabae.Adapters.RecentOrderAdapter;
 import com.example.bansal.baabae.HomeActivity;
 import com.example.bansal.baabae.Models.OrderSummary;
 import com.example.bansal.baabae.Models.SignUpForm;
+import com.example.bansal.baabae.Models.Transaction;
 import com.example.bansal.baabae.R;
 
 import java.util.ArrayList;
 
 public class RecentOrdersFragment extends BaseFragment {
     SignUpForm userForm;
-    ArrayList<OrderSummary> recentOrders;
+    ArrayList<Transaction> recentOrders;
   public static RecentOrderAdapter  adapter;
     @Nullable
     @Override
@@ -39,7 +40,7 @@ recentOrders = HomeActivity.recentOrders;
                  listView.setAdapter(adapter);
 
     }
-     public static void  refresh(ArrayList<OrderSummary> list){
+     public static void  refresh(ArrayList<Transaction> list){
         adapter.refreshEvents(list);
      }
 }

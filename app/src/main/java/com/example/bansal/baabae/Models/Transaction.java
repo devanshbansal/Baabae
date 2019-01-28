@@ -6,6 +6,7 @@ public class Transaction implements Serializable {
 private String transactionID;
 private String transactionTimeStamp;
 private  String address;
+private String userContact;
 private OrderSummary summary;
 
 public Transaction() {}
@@ -15,6 +16,19 @@ public Transaction(String id, String transactionTimeStamp,String address, OrderS
     this.transactionTimeStamp=transactionTimeStamp;
     this.summary=s;
 }
+    public Transaction(String id, String transactionTimeStamp,String address, String contact, OrderSummary s){
+        this.transactionID=id;
+        this.address=address;
+        this.transactionTimeStamp=transactionTimeStamp;
+        this.summary=s;
+        this.userContact=contact;
+    }
+
+    public Transaction(String id, String Timestamp, OrderSummary s){
+    this.transactionID=id;
+    this.transactionTimeStamp=Timestamp;
+    this.summary=s;
+    }
     public String getTransactionID() {
         return transactionID;
     }

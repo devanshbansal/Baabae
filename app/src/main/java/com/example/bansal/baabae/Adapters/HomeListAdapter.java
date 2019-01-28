@@ -1,6 +1,7 @@
 package com.example.bansal.baabae.Adapters;
 
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,7 +56,7 @@ public class HomeListAdapter extends ArrayAdapter<String> {
                 AddItem(v);
             }
         });
-        brand.setText(obj[position]);
+        brand.setText(Html.fromHtml("<b>"+obj[position]+"</b>"));
 
         //     price=convertView.findViewById(R.id.price);
         //    price.setText(obj[position].getPrice().toString());

@@ -8,7 +8,9 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="57dp"
+        tools:layout_editor_absoluteY="16dp">
 
 
         <EditText
@@ -20,20 +22,50 @@
             android:layout_alignParentTop="true"
             android:layout_marginStart="91dp"
             android:layout_marginLeft="91dp"
-            android:layout_marginTop="186dp"
+            android:layout_marginTop="153dp"
             android:ems="10"
             android:hint="Enter your Name"
-            android:inputType="textPersonName"
-            />
+            android:inputType="textPersonName" />
+
+
+        <RadioGroup
+            android:layout_width="117dp"
+            android:layout_height="76dp"
+            android:layout_alignParentTop="true"
+            android:id="@+id/gender"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="214dp"
+            android:layout_marginEnd="116dp"
+            android:layout_marginRight="116dp">
+
+            <RadioButton
+                android:id="@+id/radioButton2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/radioButton"
+                android:text="Female" />
+
+            <RadioButton
+                android:id="@+id/radioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Male" />
+        </RadioGroup>
 
         <Button
             android:id="@+id/button4"
-            android:theme="@style/MyButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="179dp"
+            android:theme="@style/MyButton"
+            android:layout_marginEnd="150dp"
+            android:layout_marginRight="150dp"
+            android:layout_marginBottom="154dp"
             android:text="Next" />
+
+
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>

@@ -1,5 +1,9 @@
 package com.example.bansal.baabae;
 
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -17,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TabHost;
 
 import com.example.bansal.baabae.Fragments.HomeFragment;
 import com.example.bansal.baabae.Fragments.ProfileFragment;
@@ -24,6 +30,7 @@ import com.example.bansal.baabae.Fragments.RecentOrdersFragment;
 import com.example.bansal.baabae.Models.OrderItem;
 import com.example.bansal.baabae.Models.OrderSummary;
 import com.example.bansal.baabae.Models.SignUpForm;
+import com.example.bansal.baabae.Models.Transaction;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,11 +42,12 @@ import java.util.HashMap;
 
 public class HomeActivity extends AppCompatActivity {
     public static SignUpForm userForm;
-    public static ArrayList<OrderSummary> recentOrders;
+    public static ArrayList<Transaction> recentOrders;
+    public static String userName;
     public static OrderSummary[] recentOrder;
 
 
-    private static final String[] TITLES = {"HOME", "RECENT ORDERS", "PROFILE"};
+    private static final String[] TITLES = {"HOME", "UPCOMING ORDERS", "PROFILE"};
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -56,46 +64,98 @@ public class HomeActivity extends AppCompatActivity {
     private ViewPager mViewPager;
 
     @Override
+    public void onBackPressed() {
+
+        if(HomeFragment.cart.getVisibility()==View.VISIBLE){
+            HomeFragment.cart.setVisibility(View.INVISIBLE);
+            HomeFragment.selectedBrands.clear();
+        }
+        else
+            super.onBackPressed();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        recentOrders=new ArrayList<OrderSummary>();
-        setTitle("asjdk");
+        recentOrders=new ArrayList<Transaction>();
+        userName=getIntent().getStringExtra("name");
         setTitle(getIntent().getStringExtra("name"));
-    //    getActionBar().setTitle(getIntent().getStringExtra("name"));
         recentOrder =new OrderSummary[0];
-       //recentOrders=(ArrayList<OrderSummary>)getIntent().getSerializableExtra("recent");
-       userForm=(SignUpForm)getIntent().getSerializableExtra("user");
+        userForm=(SignUpForm)getIntent().getSerializableExtra("user");
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        final DatabaseReference myRef = database.getReference("orders").child("users").child(userForm.getNumber());
+
+
+        final DatabaseReference myRef = database.getReference("update");
+
         myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                HashMap<String, String> value = (HashMap<String,String>)dataSnapshot.getValue();
+
+                if(value.get("isAvailable").equals("yes")){
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which) {
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    Uri uri = Uri.parse("https://play.google.com/store/apps/details?id=\"" + BuildConfig.APPLICATION_ID +"\"\\n\\n\"");
+                                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                                    startActivity(intent);
+                                    break;
+
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    Intent i = new Intent(Intent.ACTION_DIAL);
+                                    i.setData(Uri.parse("tel:9877952375"));
+                                    startActivity(i);
+                                    break;
+                            }
+                        }
+                    };
+                    AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
+                    builder.setMessage("A new version of Baabae is avaiable at Playstore. Please update the app to continue").setPositiveButton("Update", dialogClickListener)
+                            .setNegativeButton("HELP", dialogClickListener).show();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+        final DatabaseReference myRefs = database.getReference("upcoming_orders").child(userForm.getNumber());
+        myRefs.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 try{
                     recentOrders.clear();
                     ArrayList<OrderItem> r;
                     for (DataSnapshot messageSnapshot: dataSnapshot.getChildren()) {
+
                         HashMap<String,Object> summ = (HashMap<String, Object>) messageSnapshot.getValue();
                         HashMap<String,Object> s = (HashMap<String, Object>) summ.get("summary");
+                        String id= (String) summ.get("transactionID");
+                        String time= (String) summ.get("transactionTimeStamp");
                         ArrayList<Object> value = (ArrayList<Object> )s.get("items");
                         r = new ArrayList<OrderItem>();
                         for(int i=0;i<value.size();i++)
                         {
                             HashMap<Object,Object> temp=(HashMap<Object,Object>)value.get(i);
-                            r.add(new OrderItem(temp.get("name").toString(),temp.get("price").toString(),temp.get("quantity").toString()));
-
-
+                            r.add(new OrderItem(temp.get("name").toString()));
                         }
-
-                        recentOrders.add(new OrderSummary(r));
-                        recentOrder= recentOrders.toArray(new OrderSummary[0]);
+                        recentOrders.add(new Transaction(id,time,new OrderSummary(r)));
 
                     }
 
-RecentOrdersFragment.refresh(recentOrders);
+                    RecentOrdersFragment.refresh(recentOrders);
 
-                }catch(Exception e){
-
+                }
+                catch(Exception e){
+                    int a = 10;
                 }
             }
 
@@ -145,9 +205,21 @@ RecentOrdersFragment.refresh(recentOrders);
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.share) {
+            try {
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "My application name");
+                String shareMessage= "\nLet me recommend you this application\n\n";
+                shareMessage = shareMessage + "https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID +"\n\n";
+                shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+                startActivity(Intent.createChooser(shareIntent, "choose one"));
+            } catch(Exception e) {
+                //e.toString();
+            }
             return true;
         }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -177,12 +249,13 @@ RecentOrdersFragment.refresh(recentOrders);
             return fragment;
         }
 
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_home, container, false);
             //TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-         //   textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            //   textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
             return rootView;
         }
     }
@@ -205,7 +278,8 @@ RecentOrdersFragment.refresh(recentOrders);
                 case 1:
                     return new RecentOrdersFragment();
                 case 2:
-                    return new ProfileFragment();
+                    return  new ProfileFragment();
+
             }
             return null;
         }

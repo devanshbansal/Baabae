@@ -29,6 +29,12 @@ EditText text;
        next.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
+               if(!isValidMobile(text.getText().toString()))
+               {
+                   Toast.makeText(getApplicationContext(),"Please enter a valid contact number",Toast.LENGTH_SHORT).show();
+                   text.setText("");
+                   return;
+               }
                form.setNumber(text.getText().toString());
                Intent i = new Intent(getApplicationContext(),SignUpActivity3.class);
                i.putExtra("FORM", (Serializable) form);
@@ -55,5 +61,10 @@ EditText text;
             }
         });
 
+    }
+    private boolean isValidMobile(String phone) {
+        if(phone.length()<10||phone.length()>10)
+            return false;
+        return android.util.Patterns.PHONE.matcher(phone).matches();
     }
 }

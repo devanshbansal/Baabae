@@ -9,6 +9,15 @@ public class SignUpForm implements Serializable {
     private  String CourseName;
     private  String EmailId;
     private  String Password;
+    private String Gender;
+
+    public String getGender() {
+        return Gender;
+    }
+
+    public void setGender(String gender) {
+        Gender = gender;
+    }
 
     public void setName(String name) {
        Name=name;

@@ -10,9 +10,9 @@
 
 
     <style name="MyButton" parent="Theme.AppCompat.Light">
-        <item name="colorControlHighlight">#800020</item>
+        <item name="colorControlHighlight">#212121</item>
         <item name="android:textColor">#FFFFFF</item>
-        <item name="colorButtonNormal">#800020</item>
+        <item name="colorButtonNormal">#212121</item>
     </style>
 
     <style name="AppTheme.NoActionBar">

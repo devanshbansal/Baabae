@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="500dp">
+    android:layout_height="350dp">
 <LinearLayout
     android:layout_width="match_parent"
     android:orientation="vertical"
@@ -11,70 +11,69 @@
         android:id="@+id/textView9"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight=".4"
-        android:layout_margin="15dp"
+        android:layout_weight=".5"
+        android:layout_margin="10dp"
         android:text="TextView" />
 
-    <EditText
-        android:id="@+id/editText12"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_margin="15dp"
-        android:layout_weight=".15"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:ems="10"
-        android:hint="House No/ Flat No "
-        android:inputType=""
-        android:maxLines="1"
-        android:text="" />
-    <EditText
-        android:id="@+id/editText13"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight=".15"
-        android:layout_alignParentTop="true"
-        android:layout_margin="15dp"
-        android:layout_centerHorizontal="true"
-        android:ems="10"
-        android:hint="Locality/Area/Sector"
-        android:inputType=""
-        android:maxLines="1"
-        android:text="" />
-    <EditText
-        android:id="@+id/editText14"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight=".15"
-        android:layout_alignParentTop="true"
-        android:layout_margin="15dp"
-        android:layout_centerHorizontal="true"
-        android:ems="10"
-        android:hint="City"
-        android:maxLines="1"
-        android:text="" />
+    <!--<EditText-->
+        <!--android:id="@+id/editText12"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:layout_margin="15dp"-->
+        <!--android:layout_weight=".15"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:ems="10"-->
+        <!--android:hint="House No/ Flat No "-->
+        <!--android:inputType=""-->
+        <!--android:maxLines="1"-->
+        <!--android:text="" />-->
+    <!--<EditText-->
+        <!--android:id="@+id/editText13"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:layout_weight=".15"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:layout_margin="15dp"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:ems="10"-->
+        <!--android:hint="Locality/Area/Sector"-->
+        <!--android:inputType=""-->
+        <!--android:maxLines="1"-->
+        <!--android:text="" />-->
+    <!--<EditText-->
+        <!--android:id="@+id/editText14"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:layout_weight=".15"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:layout_margin="15dp"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:ems="10"-->
+        <!--android:hint="City"-->
+        <!--android:maxLines="1"-->
+        <!--android:text="" />-->
 
     <Button
         android:id="@+id/button10"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight=".125"
+        android:layout_weight=".18"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="109dp"
         android:layout_marginRight="109dp"
         android:layout_marginBottom="21dp"
-        android:layout_margin="15dp"
+        android:layout_margin="5dp"
         android:text="Confirm the Order"
         android:theme="@style/MyButton" />
-
     <Button
-        android:id="@+id/button11"
+        android:id="@+id/button12"
         android:layout_width="match_parent"
-        android:layout_margin="15dp"
+        android:layout_margin="5dp"
         android:layout_height="0dp"
-        android:layout_weight=".125"
+        android:layout_weight=".18"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
@@ -83,5 +82,20 @@
         android:layout_marginBottom="81dp"
         android:text="Add More Items"
         android:theme="@style/MyButton" />
+    <Button
+        android:id="@+id/button11"
+        android:layout_width="match_parent"
+        android:layout_margin="5dp"
+        android:layout_height="0dp"
+        android:layout_weight=".18"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="130dp"
+        android:layout_marginLeft="130dp"
+        android:layout_marginBottom="81dp"
+        android:text="Empty Cart"
+        android:theme="@style/MyButton" />
+
 </LinearLayout>
 </android.support.constraint.ConstraintLayout>

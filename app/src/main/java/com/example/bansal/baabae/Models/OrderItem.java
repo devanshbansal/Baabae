@@ -14,6 +14,9 @@ public class OrderItem {
         this.price=price;
         this.quantity=quant;
     }
+    public OrderItem(String name) {
+    this.name=name;
+    }
 
     public String getName() {
         return name;

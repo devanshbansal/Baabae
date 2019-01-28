@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="400dp">
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:maxLines="1"
+            android:id="@+id/a1"
+            android:inputType="text"
+            android:hint="Flat No/House No"
+            android:layout_weight=".2"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:maxLines="1"
+            android:hint="Area"
+            android:id="@+id/a2"
+            android:inputType="text"
+            android:layout_weight=".2"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:hint="Landmark"
+            android:layout_height="0dp"
+            android:maxLines="1"
+            android:id="@+id/a3"
+            android:inputType="text"
+            android:layout_weight=".2"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:id="@+id/done"
+            android:layout_weight=".2"
+            android:text="CONFIRM"
+            android:theme="@style/MyButton"/>
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

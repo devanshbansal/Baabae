@@ -20,6 +20,7 @@ Button signUp;
            public void Login(View v){
            Intent i= new Intent(getApplicationContext(),LoginActivity.class);
            startActivity(i);
+           finish();
 
            }
 

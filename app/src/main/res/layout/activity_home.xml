@@ -35,6 +35,7 @@
         android:id="@+id/tl_title"
         android:layout_width="match_parent"
         android:layout_height="35dp"
+        app:tabIndicatorColor="#ffeb3b"
         app:tabTextColor="#ffffff"
         app:tabGravity="fill"
         app:tabMode="fixed"
